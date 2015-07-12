@@ -29,21 +29,21 @@ class NewsInfo(object):
         self.related=related    # a list of related news info
         self.click=click
 
-def _getClickInfosfromRecords(records):
+def _getInfosfromMergeRecords(records):
     nInfos=[]     
     for item in records:
     #0id,1mtid,2url,3title,4newsid,5thumb,6summary,7keywords,8ctime,9commentid,
-    #10type,11source,12wapurl,13img,14mid,15mtype,16related/16click        
-    #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,16related,16click            
+    #10type,11source,12wapurl,13img,14mid,15mtype,m2:16related/m:16click        
+    #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,m2:16related,m:16click            
         nInfos.append(NewsInfo(item[14],item[3],item[2],item[5],item[6],item[11],item[8],
                                 item[12],item[13],item[15],[],item[16]))
     return nInfos
-def _getInfosfromRecords(records):
+def _getInfosfromMerge2Records(records):
     nInfos=[]
     for item in records:
     #0id,1mtid,2url,3title,4newsid,5thumb,6summary,7keywords,8ctime,9commentid,
-    #10type,11source,12wapurl,13img,14mid,15mtype,16related/16click        
-    #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,16related,16click
+    #10type,11source,12wapurl,13img,14mid,15mtype,m2:16related/m:16click        
+    #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,m2:16related,m:16click
         related=[]
         relmids=item[16].split(';;')
         for relmid in relmids:
@@ -64,14 +64,14 @@ def getTopRecords(mid,ctime='0',topnum=10,mtype=None,click=0):
     if mtype == type_hot:
         records=tablemerge.getTopClickRecords(mergetable, topnum)
         if records!=-1 and len(records)>0:
-            nInfos+=_getClickInfosfromRecords(records)
+            nInfos+=_getInfosfromMergeRecords(records)
     else:        
         if mtype == type_new:
             records=tablemerge2.getTopRecords(mergetable2, topnum)    
         else:        
             records=tablemerge2.getTopRecords(mergetable2, topnum, mtype)
         if records!=-1 and len(records)>0:
-            nInfos+=_getInfosfromRecords(records)            
+            nInfos+=_getInfosfromMerge2Records(records)            
     return nInfos
 
 def getRefreshRecords(mid,ctime='0',topnum=10,mtype=None,click=0):
@@ -84,7 +84,7 @@ def getRefreshRecords(mid,ctime='0',topnum=10,mtype=None,click=0):
     else:        
         records=tablemerge2.getBottomETBMRecords(mergetable2, ctime,mid,topnum,mtype)
     if records!=-1 and len(records)>0:
-        nInfos+=_getInfosfromRecords(records)
+        nInfos+=_getInfosfromMerge2Records(records)
     if len(nInfos)<int(topnum):
         if mtype == type_new:
             records=tablemerge2.getBottomBTRecords(mergetable2, ctime,topnum-len(nInfos))
@@ -93,32 +93,32 @@ def getRefreshRecords(mid,ctime='0',topnum=10,mtype=None,click=0):
         else:            
             records=tablemerge2.getBottomBTRecords(mergetable2, ctime,topnum-len(nInfos),mtype)
         if records!=-1 and len(records)>0:
-            nInfos+=_getInfosfromRecords(records)
+            nInfos+=_getInfosfromMerge2Records(records)
     return nInfos
 
 def getMoreRecords(mid,ctime='0',topnum=10,mtype=None,click=0):
     nInfos=[]         
     if mtype == type_hot:
         records=tablemerge.getTopECSMRecords(mergetable, click, mid, topnum)
-        nInfos+=_getClickInfosfromRecords(records)
+        nInfos+=_getInfosfromMergeRecords(records)
     else:        
         if mtype == type_new:
             records=tablemerge2.getTopETSMRecords(mergetable2, ctime,mid,topnum)
         else:        
             records=tablemerge2.getTopETSMRecords(mergetable2, ctime,mid,topnum,mtype)
         if records!=-1 and len(records)>0:
-            nInfos+=_getInfosfromRecords(records)
+            nInfos+=_getInfosfromMerge2Records(records)
     if len(nInfos)<int(topnum):
         if mtype ==type_hot:
             records=tablemerge.getTopSCRecords(mergetable, click, topnum-len(nInfos))
-            nInfos+=_getClickInfosfromRecords(records)
+            nInfos+=_getInfosfromMergeRecords(records)
         else:
             if mtype == type_new:     
                 records=tablemerge2.getTopSTRecords(mergetable2, ctime,topnum-len(nInfos))
             else:
                 records=tablemerge2.getTopSTRecords(mergetable2, ctime,topnum-len(nInfos),mtype)
             if records!=-1 and len(records)>0:
-                nInfos+=_getInfosfromRecords(records)
+                nInfos+=_getInfosfromMerge2Records(records)
     return nInfos
 
 # def getRelatedRecords(mid,ctime='0',topnum=10,mtype=None,click=0):
@@ -153,10 +153,10 @@ def getSearchedRelated(mid,ctime='0',topnum=10,mtype=None,click=0):
         for item in records:
             if item['mid']==mid:
                 continue
-            #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,16related,16click
+            #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,m2:16related,m:16click
             nInfos.append(NewsInfo(item['mid'],item['title'],item['url'],item['thumb'],item['summary'],
                                     item['source'],item['ctime'],item['wapurl'],item['img'],item['mtype'],
-                                    item['related'],item['click']))
+                                    [],0))
     if len(nInfos)>topnum:
         return nInfos[0:topnum]
     return nInfos
@@ -167,8 +167,8 @@ def getSearchedPage(keywords,pagenum=1):
     records=search.searchWithPage(keywords,page=pagenum)
     if records!=None and len(records)>0:
         for item in records:
-            #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,16related,16click
+            #14mid,3title,2url,5thumb,6brief,11source,8ctime,12wapurl,13img,15mtype,m2:16related,m:16click
             nInfos.append(NewsInfo(item['mid'],item['title'],item['url'],item['thumb'],item['summary'],
                                     item['source'],item['ctime'],item['wapurl'],item['img'],item['mtype'],
-                                    item['related'],item['click']))
+                                    [],0))
     return nInfos

@@ -108,7 +108,7 @@ class SearchHandler(BaseHandler):
     """The handler to return the recent news records"""
     def get(self, call):
 #         print call
-        keywords=str(self.get_argument('keywords'))        
+        keywords=str(self.get_argument('keywords').encode('utf-8'))        
         pagenum = str(self.get_argument('page', '1'))  
         records = self.getRecords(keywords,pagenum)
         #get thte user's ip addr
