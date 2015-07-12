@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+    {% for item in records%}
+    <video>
+    	{% for url in item.urls %}
+    	<furl>{{url}}</furl>
+    	{% endfor %}
+    </video>    
+    {% endfor %}
+</records>
