@@ -140,7 +140,7 @@ def ChkExistRow(tablename, newsid,source):
     return True
 
 def getTitleSummary(tablename):
-    query = "SELECT title,summary,ctime,source FROM " + tablename +' order by title desc,ctime desc'
+    query = "SELECT id,title,summary,ctime,source FROM " + tablename +' order by title desc,ctime desc'
     rows = dbconn.Select(query, ())
     return rows
 

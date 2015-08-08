@@ -163,7 +163,7 @@ def addRelated(tablename,mid,addmid):
         dbconn.Update(query, (related,mid))
         
 def getTitleSummary(tablename):
-    query = "SELECT title,summary,ctime,source FROM " + tablename +' order by title desc,ctime desc'
+    query = "SELECT mtid,title,summary,ctime,source FROM " + tablename +' order by title desc,ctime desc'
     rows = dbconn.Select(query, ())
     return rows
 
