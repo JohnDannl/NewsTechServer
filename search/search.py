@@ -5,7 +5,8 @@ Created on 2014-10-29
 
 @author: JohnDannl
 '''
-from sphinxapi import *
+from coreseekapi import *
+# from sphinxapi import *
 import sys, time
 import math
 
@@ -16,9 +17,9 @@ q = ''
 mode= SPH_MATCH_ANY
 # mode=SPH_MATCH_EXTENDED
 host = 'localhost'
-port = 9312
+port = 9313
 # index = '*'
-index='merge2_index'
+index='newstech_merge2_index'
 filtercol = 'group_id'
 filtervals = []
 # sortby=''
@@ -120,16 +121,19 @@ def searchWithPage(keys,page=1):
         return resList[(page-1)*15:page*15]
      
 if __name__=='__main__':
-#     keys='国民党'
+    keys='国民'
 #     keys='2014'
-    keys='apple'
+#     keys='apple'
 #     search(keys)
 #     resList=searchWithLimit(keys,limit=20)
     resList=searchWithPage(keys,page=1)
-    n=0
-    for res in resList:   
-        n += 1     
-        print '%d. mid=%s,title=%s,summary=%s' % (n, res['mid'],res['title'],res['summary'])
+    if not resList:
+        print 'no search result'
+    else:        
+        n=0
+        for res in resList:   
+            n += 1     
+            print '%d. newsid=%s,title=%s' % (n, res['newsid'],res['title'])
 #     for res in resList:   
 #         n += 1     
 #         print '%d. doc_id=%s, weight=%d, title=%s' % (n, res['id'], res['weight'], res['title'])

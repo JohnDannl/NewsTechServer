@@ -23,6 +23,7 @@ import logging
 import time
 import newsinfo
 
+# port from 8889 ~ 9999
 define ("port", default=8897, help="run on the given port", type=int)
 
 class TemplateRendering:
@@ -75,19 +76,19 @@ class NewsHandler(BaseHandler):
     def get(self, call):
 #         print call
         topnum = str(self.get_argument('num', '10'))     
-        mid=str(self.get_argument('mid', '0'))
+        newsid=str(self.get_argument('newsid', '0'))
         ctime=str(self.get_argument('ctime', '0'))
         mtype=str(self.get_argument('mtype', 'newest'))
         click=str(self.get_argument('click', '0'))
-        print 'num:%s,mid:%s,ctime:%s,mtype:%s,click:%s'%(topnum,mid,ctime,mtype,click)
-        records = self.getRecords(call,mid,ctime,topnum,mtype,click)     
+        print 'num:%s,newsid:%s,ctime:%s,mtype:%s,click:%s'%(topnum,newsid,ctime,mtype,click)
+        records = self.getRecords(call,newsid,ctime,topnum,mtype,click)     
         #get thte user's ip addr
         self.set_header('Content-Type', 'application/xml')
         #print self.render_string('template.xml',source=source)
         print self.request.remote_ip
         self.render2('news.xml',records=records)
 
-    def getRecords(self,call,mid,ctime,topnum,mtype,click):
+    def getRecords(self,call,newsid,ctime,topnum,mtype,click):
         records=[]
         try:
             # params check
@@ -96,7 +97,7 @@ class NewsHandler(BaseHandler):
             click_num=int(click)
             if self.xtype_calls.has_key(call):
                 resp=self.xtype_calls.get(call)
-                records=resp(mid,ctime,top_num,mtype,click_num)
+                records=resp(newsid,ctime,top_num,mtype,click_num)
         except:
             logging.info('NewsHandler getRecords error!')
         if not records:
