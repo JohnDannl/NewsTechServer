@@ -21,7 +21,8 @@ from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 import os
 import logging
 import time
-import newsinfo
+import newsinfo,requestinfo
+from database import tabledup,dbconfig
 
 # port from 8889 ~ 9999
 define ("port", default=8897, help="run on the given port", type=int)
@@ -44,7 +45,6 @@ class TemplateRendering:
             raise TemplateNotFound(template_name)
         content = template.render(kwargs)
         return content
-
 
 class BaseHandler(RequestHandler, TemplateRendering):
     """
@@ -71,7 +71,7 @@ class NewsHandler(BaseHandler):
     xtype_calls={r'top':newsinfo.getTopRecords,
            r'refresh':newsinfo.getRefreshRecords,
            r'more':newsinfo.getMoreRecords,
-           r'related':newsinfo.getSearchedRelated}
+           r'related':newsinfo.getSearchedRelated }
 #            r'related':newsinfo.getRelatedRecords
     def get(self, call):
 #         print call
@@ -130,16 +130,35 @@ class SearchHandler(BaseHandler):
         if not records:
             records=[]
         return records
+
+class DuplicateHandler(RequestHandler):
+    def get(self,call):
+        newsid1=self.get_argument('newsid1')
+        newsid2=self.get_argument('newsid2')
+        tabledup.increaseFbcnt(dbconfig.duptable, newsid1, newsid2)
+        self.write('Success')
+        
+class ClickHandler(RequestHandler):
+    def get(self,call):
+        newsid=self.get_argument('newsid')
+        userid=str(self.get_argument('userid', 'anonymous'))        
+        userip=str(self.request.remote_ip)
+        mode=str(self.get_argument('mode', requestinfo.click_mod['brief']))
+        requestinfo.trackUser(newsid, userid, userip, mode)
+        self.write('Success')
         
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     settings = {
     "static_path": os.path.join(os.path.dirname(os.getcwd()), "static"),
     "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
-    "xsrf_cookies": True,
+    "xsrf_cookies": True,# will set an _xsrf cookie and include the same value 
+                         # as a non-cookie field with all POST requests
     }
     app = tornado.web.Application(handlers=[(r"/news/(\w+)", NewsHandler), \
                                             (r"/search/(\w+)", SearchHandler), \
+                                            (r"/click/(\w+)",ClickHandler),\
+                                            (r"/duplicate/(\w+)",DuplicateHandler),\
                                             (r"/(favicon\.ico|\w+\.py)", tornado.web.StaticFileHandler, dict(path=settings['static_path']))], **settings)
     http_server = tornado.httpserver.HTTPServer(app, xheaders=True)
     http_server.listen(options.port)

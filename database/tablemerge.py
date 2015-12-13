@@ -134,6 +134,8 @@ def increaseClick(tablename,newsid):
         click+=1
         query = "UPDATE " + tablename + """ SET click = %s WHERE newsid = %s"""
         dbconn.Update(query, (click,newsid))
+    else:
+        print 'newsid:%s not found'%newsid
         
 def ChkExistRow(tablename, newsid):
     query = "SELECT COUNT(id) FROM " + tablename + " WHERE newsid = %s"
