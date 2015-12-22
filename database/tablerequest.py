@@ -11,8 +11,8 @@ dbconn = db.pgdb()
 import dbconfig
 def InsertItem(tablename, data):  
     query = """INSERT INTO """ + tablename + """(
-               newsid,userid,userip,requesttime,clickmode)
-               values(%s, %s, %s, %s, %s)"""
+               newsid,userid,userip,requestime)
+               values(%s, %s, %s, %s)"""
     dbconn.Insert(query, data)
 
 def InsertItemMany(tablename, datas):
@@ -21,15 +21,15 @@ def InsertItemMany(tablename, datas):
 
 def InsertItems(tablename, datas):
     query = """INSERT INTO """ + tablename + """(
-               newsid,userid,userip,requesttime,clickmode)
-               values(%s, %s, %s, %s, %s)"""
+               newsid,userid,userip,requestime)
+               values(%s, %s, %s, %s)"""
     dbconn.insertMany(query, datas)
 
 def InsertItemDict(tablename, data):
     query = "INSERT INTO " + tablename + """(
-             newsid,userid,userip,requesttime,clickmode) 
+             newsid,userid,userip,requestime) 
              values(%(newsid)s,%(userid)s,%(userip)s, 
-             %(requesttime)s,%(clickmode)s)"""
+             %(requestime)s)"""
     dbconn.Insert(query, data)
     return 0
 def getAllCount(tablename):
@@ -49,7 +49,7 @@ def getRecordsByRequestTime(tablename, starttime, endtime):
     '''
 #     starttime = time.strftime("%Y-%m-%d %H:%M:%S", starttime)
 #     endtime=time.strftime("%Y-%m-%d %H:%M:%S", endtime)
-    query = "SELECT * FROM " + tablename + """ WHERE requesttime >= %s AND requesttime <= %s""" 
+    query = "SELECT * FROM " + tablename + """ WHERE requestime >= %s AND requestime <= %s""" 
     rows = dbconn.Select(query, (starttime,endtime))   
     return rows
 
@@ -61,14 +61,18 @@ def getRecordsBiggerId(tablename,mId):
 
 def getTopNewsids(tablename,topnum=10):
 #     return [(newsid),]
-    query='select newsid from '+tablename+' order by requesttime desc,newsid desc limit %s'
+    query='select newsid from '+tablename+' order by requestime desc,newsid desc limit %s'
     rows=dbconn.Select(query,(topnum,))
     return rows
 
-def getUserTopNewsids(tablename,userid,topnum=10):
+def getUserTopNewsids(tablename,userid,topnum=10,rqtime=None):
     #     return [(newsid),]
-    query='select newsid from '+tablename+'where userid = %s order by requesttime desc,newsid desc limit %s'
-    rows=dbconn.Select(query,(userid,topnum))
+    if rqtime!=None:
+        query='select newsid,requestime from '+tablename+'where userid = %s and requestime < %s order by requestime desc,newsid desc limit %s'
+        rows=dbconn.Select(query,(userid,rqtime,topnum))
+    else:
+        query='select newsid,requestime from '+tablename+'where userid = %s order by requestime desc,newsid desc limit %s'
+        rows=dbconn.Select(query,(userid,topnum))
     return rows
 
 # def deleteRecord(tablename,abspath):
@@ -88,7 +92,7 @@ def getUserTopNewsids(tablename,userid,topnum=10):
 # def restoreRecord(tablename,data):
 #     if ChkExistRow(tablename, data[0]):
 #         query = """update """ + tablename + """ set size=%s,
-#                 requesttime=%s, available=%s
+#                 requestime=%s, available=%s
 #                 where abspath=%s"""
 #         tmp=data[2:5]
 #         tmp.append(data[0])
@@ -116,14 +120,13 @@ def CreateTable(tablename):
     query = """CREATE TABLE """ + tablename + """(
                id serial primary key,                                             
                newsid varchar(255), 
-               userid varchar(1024),                               
+               userid varchar(255),                               
                userip varchar(255),        
-               requesttime bigint,
-               clickmode varchar(255))"""
+               requestime bigint)"""
     dbconn.CreateTable(query, tablename)
     dbconn.CreateIndex('create index on %s (newsid)'%(tablename,))
     dbconn.CreateIndex('create index on %s (userid)'%(tablename,))
-    dbconn.CreateIndex('create index on %s (requesttime)'%(tablename,))
+    dbconn.CreateIndex('create index on %s (requestime)'%(tablename,))
 
 if __name__ == "__main__":
     CreateTable(dbconfig.requesttable)

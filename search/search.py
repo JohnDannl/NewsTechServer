@@ -28,7 +28,7 @@ sortby = '@weight DESC, ctime desc'
 groupby = ''
 groupsort = '@group desc'
 limit = 0 # limit is default set to 20 unless 0<limit<16777216
-weights = {"title":2, "summary":1}
+weights = {"title":3, "summary":1}
 
 client = SphinxClient()
 client.SetServer ( host, port )

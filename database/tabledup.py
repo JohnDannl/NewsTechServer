@@ -9,16 +9,18 @@ import db
 dbconn = db.pgdb()
 import dbconfig
 
-def _insertItem(tablename, newsid1,newsid2): 
+def insertItem(tablename, data): 
+    sortList(data)
     query = """INSERT INTO """ + tablename + """(
-               newsid1,newsid2,fbcnt)
-               values(%s, %s, %s)"""
-    dbconn.Insert(query, (newsid1,newsid2,1))
+               newsid1,newsid2,userid,fbtime)
+               values(%s, %s, %s, %s)"""
+    dbconn.Insert(query, (data))
 
-def _insertItemDict(tablename, data):
+def insertItemDict(tablename, data):
+    sortKey(data)
     query = "INSERT INTO " + tablename + """(
-             newsid1,newsid2,fbcnt) 
-             values(%(newsid1)s,%(newsid2)s, %(fbcnt)s )"""
+             newsid1,newsid2,userid,fbtime) 
+             values(%(newsid1)s,%(newsid2)s,%(userid)s,%(fbtime)s )"""
     dbconn.Insert(query, data)
     return 0
 
@@ -51,21 +53,25 @@ def _increaseFbcnt(tablename,newsid1,newsid2):
         query = "UPDATE " + tablename + """ SET fbcnt = %s WHERE newsid1 = %s and newsid2 = %s """
         dbconn.Update(query, (fbcnt,newsid1,newsid2))
 
-def increaseFbcnt(tablename,newsid1,newsid2):  
-    if newsid1==newsid2:
-        return
+def sortList(data):  
+    newsid1,newsid2=data[0],data[1]
     if newsid1 > newsid2:  # store the smaller one in newsid1
         tmp=newsid1
         newsid1=newsid2
         newsid2=tmp
-    if ChkExistRow(tablename,newsid1,newsid2):
-        _increaseFbcnt(tablename,newsid1,newsid2)
-    else:
-        _insertItem(tablename, newsid1,newsid2)
+        data[0],data[1]=newsid1,newsid2
         
-def ChkExistRow(tablename, newsid1,newsid2):
-    query = "SELECT COUNT(id) FROM " + tablename + " WHERE newsid1 = %s and newsid2= %s "
-    row = dbconn.Select(query, (newsid1,newsid2))[0][0]
+def sortKey(data):  
+    newsid1,newsid2=data['newsid1'],data['newsid2']
+    if newsid1 > newsid2:  # store the smaller one in newsid1
+        tmp=newsid1
+        newsid1=newsid2
+        newsid2=tmp
+        data['newsid1'],data['newsid2']=newsid1,newsid2
+        
+def ChkExistRow(tablename, data):
+    query = "SELECT COUNT(id) FROM " + tablename + " WHERE newsid1 = %s and newsid2 = %s "
+    row = dbconn.Select(query, (data[0],data[1]))[0][0]
     if row == 0:
         return False
     return True
@@ -76,8 +82,9 @@ def CreateNewsTable(tablename):
     query = """CREATE TABLE """ + tablename + """(
                id serial primary key, 
                newsid1 varchar(255),         
-               newsid2 varchar(255),                              
-               fbcnt int)"""
+               newsid2 varchar(255), 
+               userid varchar(255),
+               fbtime bigint)"""
     dbconn.CreateTable(query, tablename)
     dbconn.CreateIndex('create index on %s (newsid1,newsid2)'%tablename)
 

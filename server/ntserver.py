@@ -18,11 +18,10 @@ from tornado.options import define, options
 from tornado.web import RequestHandler
 import jinja2
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
-import os
-import logging
-import time
+import os,logging,time
 import newsinfo,requestinfo
-from database import tabledup,dbconfig
+from database import dbconfig
+from volunteer import SigninHandler,LoginHandler,WelcomeHandler,DuplicateHandler
 
 # port from 8889 ~ 9999
 define ("port", default=8897, help="run on the given port", type=int)
@@ -130,21 +129,13 @@ class SearchHandler(BaseHandler):
         if not records:
             records=[]
         return records
-
-class DuplicateHandler(RequestHandler):
-    def get(self,call):
-        newsid1=self.get_argument('newsid1')
-        newsid2=self.get_argument('newsid2')
-        tabledup.increaseFbcnt(dbconfig.duptable, newsid1, newsid2)
-        self.write('Success')
         
 class ClickHandler(RequestHandler):
     def get(self,call):
         newsid=self.get_argument('newsid')
         userid=str(self.get_argument('userid', 'anonymous'))        
         userip=str(self.request.remote_ip)
-        mode=str(self.get_argument('mode', requestinfo.click_mod['brief']))
-        requestinfo.trackUser(newsid, userid, userip, mode)
+        requestinfo.trackUser(newsid, userid, userip)
         self.write('Success')
         
 if __name__ == "__main__":
@@ -152,12 +143,15 @@ if __name__ == "__main__":
     settings = {
     "static_path": os.path.join(os.path.dirname(os.getcwd()), "static"),
     "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
-    "xsrf_cookies": True,# will set an _xsrf cookie and include the same value 
+    "xsrf_cookies": False,# True will set an _xsrf cookie and include the same value 
                          # as a non-cookie field with all POST requests
     }
     app = tornado.web.Application(handlers=[(r"/news/(\w+)", NewsHandler), \
                                             (r"/search/(\w+)", SearchHandler), \
                                             (r"/click/(\w+)",ClickHandler),\
+                                            (r"/signin", SigninHandler), \
+                                            (r"/login/(\w+)", LoginHandler), \
+                                            (r"/welcome", WelcomeHandler), \
                                             (r"/duplicate/(\w+)",DuplicateHandler),\
                                             (r"/(favicon\.ico|\w+\.py)", tornado.web.StaticFileHandler, dict(path=settings['static_path']))], **settings)
     http_server = tornado.httpserver.HTTPServer(app, xheaders=True)

@@ -9,15 +9,8 @@ from database import tablemerge,tablerequest
 from database.dbconfig import mergetable,requesttable
 import time,logging
 
-click_mod={'brief':'brief','detail':'detail'}
-
-def trackUser(newsid,userid,userip,mode):
-    # newsid,userid,userip,requesttime,clickmode
-#     try:
-    if mode in click_mod.values():
-        tablemerge.increaseClick(mergetable,newsid)     
+def trackUser(newsid,userid,userip):
+    # newsid,userid,userip,requesttime
     requesttime=long(time.time())   
-    data=(newsid,userid,userip,requesttime,mode)
+    data=(newsid,userid,userip,requesttime)
     tablerequest.InsertItem(requesttable, data)
-#     except:
-#         logging.error('trackUser database visit error')

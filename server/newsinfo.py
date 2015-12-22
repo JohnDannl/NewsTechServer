@@ -38,6 +38,7 @@ def _getInfosfromMergeRecords(records):
         nInfos.append(NewsInfo(item[4],item[3],item[2],item[5],item[6],item[9],item[8],
                                 item[10],item[11],item[12],[],item[13]))
     return nInfos
+
 def _getInfosfromMerge2Records(records):
     nInfos=[]
     for item in records:
