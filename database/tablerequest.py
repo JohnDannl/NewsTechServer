@@ -68,10 +68,10 @@ def getTopNewsids(tablename,topnum=10):
 def getUserTopNewsids(tablename,userid,topnum=10,rqtime=None):
     #     return [(newsid),]
     if rqtime!=None:
-        query='select newsid,requestime from '+tablename+'where userid = %s and requestime < %s order by requestime desc,newsid desc limit %s'
+        query='select newsid,requestime from '+tablename+' where userid = %s and requestime < %s order by requestime desc,newsid desc limit %s'
         rows=dbconn.Select(query,(userid,rqtime,topnum))
     else:
-        query='select newsid,requestime from '+tablename+'where userid = %s order by requestime desc,newsid desc limit %s'
+        query='select newsid,requestime from '+tablename+' where userid = %s order by requestime desc,newsid desc limit %s'
         rows=dbconn.Select(query,(userid,topnum))
     return rows
 
@@ -129,7 +129,7 @@ def CreateTable(tablename):
     dbconn.CreateIndex('create index on %s (requestime)'%(tablename,))
 
 if __name__ == "__main__":
-    CreateTable(dbconfig.requesttable)
+    CreateTable(dbconfig.requestable)
     
 #     rows=getTopETBVRecords(dbconfig.tableName[2],'2014-09-04 10:09:02','1310457')
 #     if rows !=-1:

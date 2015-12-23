@@ -25,6 +25,6 @@ tableName={'sina':'sina','sohu':'sohu','w163':'w163','huxiu':'huxiu','ittime':'i
 
 mergetable='merge'
 mergetable2='merge2'
-requesttable='request'
+requestable='request'
 duptable='duplicate'
 volunteertable='volunteer'

@@ -138,6 +138,14 @@ class ClickHandler(RequestHandler):
         requestinfo.trackUser(newsid, userid, userip)
         self.write('Success')
         
+class UserHistoryHandler(BaseHandler):
+    def get(self,call):
+        userid=str(self.get_argument('userid', 'anonymous')) 
+        rqtime=str(self.get_argument('requestime',long(time.time())))
+        topnum = str(self.get_argument('num', '30'))    
+        records=requestinfo.getHistoryInfo(userid, rqtime, topnum)
+        self.render2('userhistory.xml',records=records)
+        
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     settings = {
@@ -153,6 +161,7 @@ if __name__ == "__main__":
                                             (r"/login/(\w+)", LoginHandler), \
                                             (r"/welcome", WelcomeHandler), \
                                             (r"/duplicate/(\w+)",DuplicateHandler),\
+                                            (r"/history/(\w+)",UserHistoryHandler),\
                                             (r"/(favicon\.ico|\w+\.py)", tornado.web.StaticFileHandler, dict(path=settings['static_path']))], **settings)
     http_server = tornado.httpserver.HTTPServer(app, xheaders=True)
     http_server.listen(options.port)

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--4newsid,3title,2url,5thumb,6brief,9source,8ctime,10author,11description,12mtype,13click/related,requestime -->
+<records>
+    {% for item in records %}
+    <item>    	
+    	<newsid>{{item.newsid}}</newsid>
+	    <title>{{item.title}}</title>
+	    <url>{{item.url}}</url>
+	    <thumb>{{item.thumb}}</thumb>
+		<brief>{{item.brief}}</brief>
+		<source>{{item.source}}</source>
+		<ctime>{{item.ctime}}</ctime>
+		<author>{{item.author}}</author>
+		<description>{{item.description}}</description>		
+		<mtype>{{item.mtype}}</mtype>		
+		<related>
+			{%for item in item.related %}
+			<ritem>
+				<rnewsid>{{item.newsid}}</rnewsid>
+			    <rtitle>{{item.title}}</rtitle>
+			    <rurl>{{item.url}}</rurl>
+			    <rthumb>{{item.thumb}}</rthumb>
+				<rbrief>{{item.brief}}</rbrief>
+				<rsource>{{item.source}}</rsource>
+				<rctime>{{item.ctime}}</rctime>
+				<rauthor>{{item.author}}</rauthor>
+				<rdescription>{{item.description}}</rdescription>	
+				<rmtype>{{item.mtype}}</rmtype>
+				<rrelated></rrelated>
+				<rclick>{{item.click}}</rclick>
+			</ritem>
+			{% endfor %}
+		</related>
+		<click>{{item.click}}</click>
+		<requestime>{{item.requestime}}</requestime>
+	</item>
+    {% endfor %}
+</records>
