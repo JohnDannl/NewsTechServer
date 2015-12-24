@@ -43,63 +43,73 @@ class SigninHandler(UserHandler):
         name=self.get_argument('name', 'anonymous')
         email=self.get_argument('email')
         password=self.get_argument('password')
-        if self.checkUser(userid):
-            self.redirect('/signin')
+        if self.checkUserId(userid):                
+            self.write('This device has been registered')           
         else:
             self.signin(userid,name,email,password)
             self.redirect("/login/login")
         
-    def checkUser(self,userid):
+    def checkUserId(self,userid):
         return tablevolunteer.ChkExistRow(dbconfig.volunteertable, userid)
-    
+          
     def signin(self,userid,name,email,password):
         data=(userid,name,email,password,long(time.time()))
-        tablevolunteer.insertItem(dbconfig.volunteertable, data)
+        tablevolunteer.insertItem(dbconfig.volunteertable, data)   
         
 class LoginHandler(UserHandler):
     def get(self,call):
         if call =='changepassword':
-            self.write('<html><body><form action="/login" method="post">'
+            self.write('<html><body><form action="/login/changepassword" method="post">'
                    '<p>Name: <input type="text" name="name"></p>'
                    '<p>Password: <input type="text" name="password"></p>'
                    '<p>New password: <input type="text" name="newpassword"></p>'
                    '<p><input type="submit" value="Log in"></p>'
                    '</form></body></html>')
         else:
-            self.write('<html><body><form action="/login" method="post">'
+            self.write('<html><body><form action="/login/login" method="post">'
                        '<p>Name: <input type="text" name="name"></p>'
                        '<p>Password: <input type="text" name="password"></p>'
                        '<p><input type="submit" value="Log in"></p>'
                        '</form></body></html>') 
     def post(self,call):
         userid=self.get_argument('userid')
+        name= self.get_argument('name')
         password=self.get_argument('password')        
-        if self.checkUser(userid):
-            if self.authorizeUser(userid, password):
+        if self.checkUserId(userid):
+            if self.authorizeUser(userid, name,password):
                 self.set_secure_cookie("userid", self.get_argument("userid"))
                 #name=self.get_argument('name')
-                if call=='changepassword':
+                if call =='changepassword':
                     newpassword=self.get_argument('newpassword')
                     self.changePassword(userid, newpassword)
                     self.write('Change password successfully')
+                elif call =='changeinfo':
+                    newname=self.get_argument('newname')
+                    newemail=self.get_argument('newemail')
+                    self.changUserInfo(userid,newname,newemail)
+                    self.write('Change info successfully')
                 else:
                     self.redirect("/welcome")
             else:
-                self.redirect('/login/login')
+                self.write('User authorization failure')
         else:
             self.redirect('/signin')
     
-    def checkUser(self,userid):
+    def checkUserId(self,userid):
         return tablevolunteer.ChkExistRow(dbconfig.volunteertable, userid)
     
-    def authorizeUser(self,userid,password):
-        if tablevolunteer.getPasswordByUserId(dbconfig.volunteertable, userid) == password:
+    def authorizeUser(self,userid,name,password):
+        if tablevolunteer.getPasswordByUserId(dbconfig.volunteertable, userid) == password and \
+        tablevolunteer.getNameByUserId(dbconfig.volunteertable, userid) == name:
             return True
         else:
             return False
         
     def changePassword(self,userid,newpassword):
-        tablevolunteer.updatePasswordByUserId(dbconfig.volunteertable, newpassword, userid)        
+        tablevolunteer.updatePasswordByUserId(dbconfig.volunteertable, newpassword, userid)   
+             
+    def changUserInfo(self,userid,newname,newemail):
+        tablevolunteer.updateUserInfoByUserId(dbconfig.volunteertable, newname,newemail,userid)   
             
 class DuplicateHandler(UserHandler):
     def get(self,call):

@@ -51,9 +51,20 @@ def getPasswordByUserId(tablename,userid):
     if rows!=-1:
         return rows[0][0]
     
+def getNameByUserId(tablename,userid):
+    query = 'Select name from '+ tablename +' where userid = %s '
+    rows = dbconn.Select(query,(userid,))
+    if rows!=-1:
+        return rows[0][0]
+    
 def updatePasswordByUserId(tablename,newpassword,userid):
     query ='update '+tablename+' set password =  %s where userid = %s '
     rows=dbconn.Update(query, (newpassword,userid))
+    return rows
+
+def updateUserInfoByUserId(tablename,newname,newemail,userid):
+    query ='update '+tablename+' set name =  %s , email = %s where userid = %s '
+    rows=dbconn.Update(query, (newname,newemail,userid))
     return rows
 
 def ChkExistRow(tablename, userid):
