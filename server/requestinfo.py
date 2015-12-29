@@ -29,8 +29,9 @@ class RequestInfo(object):
 def trackUser(newsid,userid,userip):
     # newsid,userid,userip,requesttime
     requesttime=long(time.time())   
-    data=(newsid,userid,userip,requesttime)
+    data=(newsid,userid,userip,requesttime)    
     tablerequest.InsertItem(dbconfig.requestable, data)
+    tablemerge.increaseClick(dbconfig.mergetable, newsid)
 
 def _getRequestInfosfromMerge2Record(record,requestime):
     #0id,1webid/mtid,2url,3title,4newsid,5thumb,6summary,7keywords,8ctime,9source,

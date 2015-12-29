@@ -24,6 +24,7 @@ class WelcomeHandler(UserHandler):
         if not self.current_user:
             self.redirect("/login/login")
             return
+#        self.set_secure_cookie("userid", self.current_user)
         self.write('Hello,'+self.current_user)
         
 class SigninHandler(UserHandler):
