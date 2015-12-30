@@ -13,14 +13,14 @@ def insertItem(tablename, data):
     if ChkExistRow(tablename, data[0]):
         return
     query = """INSERT INTO """ + tablename + """(
-               userid,name,email,password,registertime)
-               values(%s, %s, %s, %s, %s)"""
+               userid,name,email,password,registertime,auth)
+               values(%s, %s, %s, %s, %s, %s)"""
     dbconn.Insert(query, (data))
 
 def insertItemDict(tablename, data):
     query = "INSERT INTO " + tablename + """(
-             userid,name,email,password,registertime) 
-             values(%(userid)s, %(name)s, %(email)s, %(password)s, %(registertime)s )"""
+             userid,name,email,password,registertime,auth) 
+             values(%(userid)s, %(name)s, %(email)s, %(password)s, %(registertime)s, %(auth)s )"""
     dbconn.Insert(query, data)
     return 0
 
@@ -47,6 +47,17 @@ def getRecordsById(tablename,webid):
 
 def getPasswordByUserId(tablename,userid):
     query = 'Select password from '+ tablename +' where userid = %s '
+    rows = dbconn.Select(query,(userid,))
+    if rows!=-1:
+        return rows[0][0]
+    
+def setAuthorizationByUserId(tablename,userid,auth):
+    query = 'Update '+tablename+' set auth = %s where userid = %s '
+    rows=dbconn.Update(query, (auth,userid))
+    return rows 
+
+def getAuthorizationByUserId(tablename,userid):
+    query = 'Select auth from '+ tablename +' where userid = %s '
     rows = dbconn.Select(query,(userid,))
     if rows!=-1:
         return rows[0][0]
@@ -83,7 +94,8 @@ def CreateNewsTable(tablename):
                name varchar(255), 
                email varchar(255),
                password varchar(255),
-               registertime bigint)"""
+               registertime bigint,
+               auth boolean)"""
     dbconn.CreateTable(query, tablename)
     dbconn.CreateIndex('create index on %s (userid)'%tablename)
 

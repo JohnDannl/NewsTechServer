@@ -54,7 +54,8 @@ class SigninHandler(UserHandler):
         return tablevolunteer.ChkExistRow(dbconfig.volunteertable, userid)
           
     def signin(self,userid,name,email,password):
-        data=(userid,name,email,password,long(time.time()))
+        '''Note: default the authorization is true'''
+        data=(userid,name,email,password,long(time.time()),True)
         tablevolunteer.insertItem(dbconfig.volunteertable, data)   
         
 class LoginHandler(UserHandler):
@@ -77,7 +78,10 @@ class LoginHandler(UserHandler):
         name= self.get_argument('name')
         password=self.get_argument('password')        
         if self.checkUserId(userid):
-            if self.authorizeUser(userid, name,password):
+            if self.checkUserPassword(userid, name, password):
+                if not self.authorizeUser(userid):
+                    self.write("No authorization")
+                    return
                 self.set_secure_cookie("userid", self.get_argument("userid"))
                 #name=self.get_argument('name')
                 if call =='changepassword':
@@ -99,12 +103,15 @@ class LoginHandler(UserHandler):
     def checkUserId(self,userid):
         return tablevolunteer.ChkExistRow(dbconfig.volunteertable, userid)
     
-    def authorizeUser(self,userid,name,password):
+    def checkUserPassword(self,userid,name,password):
         if tablevolunteer.getPasswordByUserId(dbconfig.volunteertable, userid) == password and \
         tablevolunteer.getNameByUserId(dbconfig.volunteertable, userid) == name:
             return True
         else:
             return False
+        
+    def authorizeUser(self,userid):
+        return tablevolunteer.getAuthorizationByUserId(dbconfig.volunteertable, userid)            
         
     def changePassword(self,userid,newpassword):
         tablevolunteer.updatePasswordByUserId(dbconfig.volunteertable, newpassword, userid)   
@@ -123,3 +130,4 @@ class DuplicateHandler(UserHandler):
         data=(newsid1,newsid2,userid,long(time.time()))
         tabledup.insertItem(dbconfig.duptable, data)
         self.write('Submit duplication successfully')
+
