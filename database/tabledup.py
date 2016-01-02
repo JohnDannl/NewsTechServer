@@ -10,11 +10,11 @@ dbconn = db.pgdb()
 import dbconfig
 
 def insertItem(tablename, data): 
-    sortList(data)
+    data=sortList(data)
     query = """INSERT INTO """ + tablename + """(
                newsid1,newsid2,userid,fbtime)
                values(%s, %s, %s, %s)"""
-    dbconn.Insert(query, (data))
+    dbconn.Insert(query,data)
 
 def insertItemDict(tablename, data):
     sortKey(data)
@@ -54,12 +54,14 @@ def _increaseFbcnt(tablename,newsid1,newsid2):
         dbconn.Update(query, (fbcnt,newsid1,newsid2))
 
 def sortList(data):  
+    data=list(data)
     newsid1,newsid2=data[0],data[1]
     if newsid1 > newsid2:  # store the smaller one in newsid1
         tmp=newsid1
         newsid1=newsid2
         newsid2=tmp
         data[0],data[1]=newsid1,newsid2
+    return data
         
 def sortKey(data):  
     newsid1,newsid2=data['newsid1'],data['newsid2']
