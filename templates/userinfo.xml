@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Welcome-->
+<user>
+    <userid>{{user.userid}}</userid>
+    <name>{{user.name}}</name>
+    <email>{{user.email}}</email>
+    <registertime>{{user.registertime}}</registertime>
+</item>

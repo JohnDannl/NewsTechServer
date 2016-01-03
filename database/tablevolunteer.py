@@ -67,6 +67,12 @@ def getNameByUserId(tablename,userid):
     rows = dbconn.Select(query,(userid,))
     if rows!=-1:
         return rows[0][0]
+
+def getUserInfoByUserId(tablename,userid):
+    query = 'Select userid,name,email,registertime from '+ tablename +' where userid = %s '
+    rows = dbconn.Select(query,(userid,))
+    if rows!=-1:
+        return rows[0]
     
 def updatePasswordByUserId(tablename,newpassword,userid):
     query ='update '+tablename+' set password =  %s where userid = %s '

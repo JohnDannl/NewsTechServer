@@ -13,19 +13,23 @@ import tornado.web
 from database import tabledup, dbconfig
 from database import tablevolunteer
 
+class UserInfo(object):
+    def __init__(self,userid,name,email,registertime):
+        self.userid=userid
+        self.name=name
+        self.email=email
+        self.registertime=registertime
+
+def getUserInfoByUserId(userid):
+    userinfo=tablevolunteer.getUserInfoByUserId(dbconfig.volunteertable, userid)
+    if len(userinfo)==4:
+        return UserInfo(userinfo[0],userinfo[1],userinfo[2],userinfo[3])
+    
 class UserHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         userid=self.get_secure_cookie("userid", max_age_days=31)
         if userid:
             return tornado.escape.xhtml_escape(userid)
-
-class WelcomeHandler(UserHandler):
-    def get(self):
-        if not self.current_user:
-            self.redirect("/login/login")
-            return
-#        self.set_secure_cookie("userid", self.current_user)
-        self.write('Hello,'+self.current_user)
         
 class SigninHandler(UserHandler):
     '''The cookie data should contain 4 fields:

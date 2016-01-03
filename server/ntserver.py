@@ -21,7 +21,7 @@ from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 import os,logging,time
 import newsinfo,requestinfo
 from database import dbconfig
-from volunteer import SigninHandler,LoginHandler,WelcomeHandler,DuplicateHandler
+from volunteer import SigninHandler,LoginHandler,UserHandler,DuplicateHandler,getUserInfoByUserId
 
 # port from 8889 ~ 9999
 define ("port", default=8897, help="run on the given port", type=int)
@@ -145,6 +145,17 @@ class UserHistoryHandler(BaseHandler):
         topnum = str(self.get_argument('num', '30'))    
         records=requestinfo.getHistoryInfo(userid, rqtime, topnum)
         self.render2('userhistory.xml',records=records)
+
+class WelcomeHandler(UserHandler,BaseHandler):
+    def get(self):
+        if not self.current_user:
+            self.redirect("/login/login")
+            return
+#        self.set_secure_cookie("userid", self.current_user)
+        #self.write('Hello,'+self.current_user)
+        #userid,name,email,registertime
+        user=getUserInfoByUserId(self.current_user)
+        self.render2("userinfo.xml",user=user)
         
 if __name__ == "__main__":
     tornado.options.parse_command_line()
