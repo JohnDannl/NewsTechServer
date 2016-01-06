@@ -20,7 +20,7 @@ import jinja2
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 import os,logging,time
 import newsinfo,requestinfo
-from database import dbconfig
+from database import dbconfig, tablesuggest
 from volunteer import SigninHandler,LoginHandler,UserHandler,DuplicateHandler,getUserInfoByUserId
 
 # port from 8889 ~ 9999
@@ -157,6 +157,18 @@ class WelcomeHandler(UserHandler,BaseHandler):
         user=getUserInfoByUserId(self.current_user)
         self.render2("userinfo.xml",user=user)
         
+class SuggestHandler(RequestHandler):
+    '''The post data should contain 4 fields:
+    <1> userid,<2> email,<3> suggestion ''' 
+    def post(self):
+        #name=self.get_argument('name')
+        userid=self.get_argument("userid")
+        email=self.get_argument('email')
+        suggestion=self.get_argument('suggestion')     
+        data=(userid,email,suggestion,long(time.time())) 
+        tablesuggest.insertItem(dbconfig.suggestable, data)  
+        self.write("Submit successfully")
+
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     settings = {
@@ -173,6 +185,7 @@ if __name__ == "__main__":
                                             (r"/welcome", WelcomeHandler), \
                                             (r"/duplicate/(\w+)",DuplicateHandler),\
                                             (r"/history/(\w+)",UserHistoryHandler),\
+                                            (r"/suggest", SuggestHandler), \
                                             (r"/(favicon\.ico|\w+\.py)", tornado.web.StaticFileHandler, dict(path=settings['static_path']))], **settings)
     http_server = tornado.httpserver.HTTPServer(app, xheaders=True)
     http_server.listen(options.port)

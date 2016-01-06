@@ -28,3 +28,4 @@ mergetable2='merge2'
 requestable='request'
 duptable='duplicate'
 volunteertable='volunteer'
+suggestable="suggest"
