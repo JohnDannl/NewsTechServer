@@ -164,7 +164,7 @@ class SuggestHandler(RequestHandler):
         #name=self.get_argument('name')
         userid=self.get_argument("userid")
         email=self.get_argument('email')
-        suggestion=self.get_argument('suggestion')     
+        suggestion=self.get_argument('suggestion')   
         data=(userid,email,suggestion,long(time.time())) 
         tablesuggest.insertItem(dbconfig.suggestable, data)  
         self.write("Submit successfully")
