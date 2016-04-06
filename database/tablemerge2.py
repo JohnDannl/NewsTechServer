@@ -171,6 +171,24 @@ def getTitleSummary(tablename):
     rows = dbconn.Select(query, ())
     return rows
 
+def getTitleBiggerId(tablename,m_id):
+    # For related search
+    query='select id,title from '+tablename+' where id > %s'
+    rows=dbconn.Select(query,(m_id,))
+    return rows
+
+def getRecordsById(tablename,tid):
+    # For related search
+    query = "SELECT * FROM " + tablename+' where id = %s'
+    rows = dbconn.Select(query, (tid,))
+    return rows
+
+def getRecordsByIds(tablename,tids):
+    # For related search
+    query = "SELECT * FROM " + tablename + " WHERE id in "+tids
+    rows = dbconn.Select(query, ())    
+    return rows
+
 def CreateTable(tablename):
     query = """CREATE TABLE """ + tablename + """(
                id serial primary key, 

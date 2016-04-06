@@ -12,6 +12,7 @@ sys.path.append(r'../database')
 from database import tablemerge2,tablemerge
 from database.dbconfig import mergetable2,mergetable
 from search import search
+from w2v4related import w2vclient
 
 type_new,type_hot='newest','hot'
 class NewsInfo(object):
@@ -122,25 +123,34 @@ def getMoreRecords(newsid,ctime='0',topnum=10,mtype=None,click=0):
                 nInfos+=_getInfosfromMerge2Records(records)
     return nInfos
 
-# def getRelatedRecords(newsid,ctime='0',topnum=10,mtype=None,click=0):
-#     nInfos=[] 
-#     rows=tablemerge2.getRecordsBySourceNewsid(mergetable2,newsid)
-#     if rows==-1 or len(rows)<1:
-#         return nInfos
-#     title=rows[0][0]   
-#     records=related.getRelatedNewsList(title, 30,None,topnum+1)  # topnum+1 to exclude the news itself
-#     if records!=None and len(records)>0:
-#         for item in records:
-#         #0id,1webid,2url,3title,4newsid,5thumb,6summary,7keywords,8ctime,9commentid,10type,
-#         #11source,12wapurl,13img,14newsid,15mtype,16click
-#             # pass the same news
-#             if item[4]==newsid and item[11]==web:
-#                 continue
-#             nInfos.append(NewsInfo(item[4],item[3],item[2],item[5],item[6],item[11],item[8],
-#                                     item[12],item[13],item[15],item[16]))
-#     if len(nInfos)>topnum:
-#         return nInfos[0:topnum]
-#     return nInfos
+def getRelatedRecords(newsid,ctime='0',topnum=10,mtype=None,click=0):
+    vnInfos=getW2vRelated(newsid,ctime,topnum,mtype,click)
+    if not vnInfos:  # if esa server is broken,then use searched related
+        vnInfos=getSearchedRelated(newsid,ctime,topnum,mtype,click)  
+        print 'using searched related'  
+    return vnInfos
+
+def getW2vRelated(newsid,ctime='0',topnum=10,mtype=None,click=0):
+    nInfos=[] 
+    rows=tablemerge2.getRecordsByNewsid(mergetable2,newsid)
+    if rows==-1 or len(rows)<1:
+        return nInfos
+    title=rows[0][3]      
+    print title  
+    records=w2vclient.getRelatedRecords2(title)
+    if records!=None and len(records)>0:
+        for item in records:
+        #0id,1webid/mtid,2url,3title,4newsid,5thumb,6summary,7keywords,8ctime,9source,
+        #10author,11description,12mtype,13click/related        
+        #4newsid,3title,2url,5thumb,6brief,9source,8ctime,10author,11description,12mtype,13click/related
+            # pass the same news
+            if item[4]==newsid:
+                continue
+            nInfos.append(NewsInfo(item[4],item[3],item[2],item[5],item[6],item[9],item[8],
+                                item[10],item[11],item[12],[],0))
+    if len(nInfos)>topnum:
+        return nInfos[0:topnum]    
+    return nInfos
 
 def getSearchedRelated(newsid,ctime='0',topnum=10,mtype=None,click=0):
     nInfos=[] 

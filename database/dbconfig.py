@@ -29,3 +29,4 @@ requestable='request'
 duptable='duplicate'
 volunteertable='volunteer'
 suggestable="suggest"
+w2vtable='w2v'

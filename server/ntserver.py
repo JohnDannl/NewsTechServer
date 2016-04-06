@@ -70,8 +70,8 @@ class NewsHandler(BaseHandler):
     xtype_calls={r'top':newsinfo.getTopRecords,
            r'refresh':newsinfo.getRefreshRecords,
            r'more':newsinfo.getMoreRecords,
-           r'related':newsinfo.getSearchedRelated }
-#            r'related':newsinfo.getRelatedRecords
+#            r'related':newsinfo.getSearchedRelated }
+            r'related':newsinfo.getRelatedRecords }
     def get(self, call):
 #         print call
         topnum = str(self.get_argument('num', '10'))     
