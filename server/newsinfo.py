@@ -18,15 +18,15 @@ type_new,type_hot='newest','hot'
 class NewsInfo(object):
     def __init__(self,newsid,title,url,thumb,brief,source,ctime,author,description,mtype,related,click):
         self.newsid=newsid
-        self.title=title.decode('utf-8')
-        self.url=url.decode('utf-8')
-        self.thumb=thumb.decode('utf-8')
-        self.brief=brief.decode('utf-8')    #jinja2.escape(brief)#.replace(r'&nbsp','')
-        self.source=source.decode('utf-8')
+        self.title=title.decode('utf-8') if title else ''
+        self.url=url.decode('utf-8') if url else ''
+        self.thumb=thumb.decode('utf-8') if thumb else ''
+        self.brief=brief.decode('utf-8') if brief else ''    #jinja2.escape(brief)#.replace(r'&nbsp','')
+        self.source=source.decode('utf-8') if source else ''
         self.ctime=ctime   
-        self.author=author.decode('utf-8')     
-        self.descripiton=description.decode('utf-8')
-        self.mtype=mtype.decode('utf-8')
+        self.author=author.decode('utf-8') if author else ''    
+        self.descripiton=description.decode('utf-8') if description else ''
+        self.mtype=mtype.decode('utf-8') if mtype else ''
         self.related=related    # a list of related news info
         self.click=click
 
