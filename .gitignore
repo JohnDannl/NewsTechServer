@@ -1,4 +1,5 @@
 apk/
+!apk/newstech_update.xml
 *.pyc
 *.log
 *~
