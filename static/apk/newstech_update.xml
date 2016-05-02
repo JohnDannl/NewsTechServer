@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<info>  
+    <versionCode>2</versionCode>
+    <versionName>NewsTech_v1.1</versionName>  
+    <apkUrl>http://222.195.78.181:8897/static/apk/NewsTech_v1.1.apk</apkUrl>  
+    <description>1.更改UI设计
+2.增加相似新闻推荐</description>  
+</info> 

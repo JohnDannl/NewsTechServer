@@ -1,5 +1,6 @@
-apk/
-!static/apk/newstech_update.xml
+# if ignore the whole directory use **/apk/, if has exception use apk/*
+**/apk/*
+!apk/newstech_update.xml
 *.pyc
 *.log
 *~
